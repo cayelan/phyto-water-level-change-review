@@ -30,7 +30,9 @@ combined_vars <- data |>
     transparency_drive = ifelse(grepl("transparency", phys_drive, ignore.case = TRUE), 1, 0),
     turb_drive = ifelse(grepl("turbidity", phys_drive, ignore.case = TRUE), 1, 0),
     light_drive = ifelse(grepl("PAR", phys_drive, ignore.case = TRUE), 1, 0),
-    tss_tds_drive = ifelse(grepl("total suspended solids|tss|tds|total dissolved solid", phys_drive, ignore.case = TRUE), 1, 0),
+    tds_drive = ifelse(grepl("tds|total dissolved solid", phys_drive, ignore.case = TRUE), 1, 0),
+    tss_drive = ifelse(grepl("total suspended solids|tss|resuspension", phys_drive, ignore.case = TRUE), 1, 0), #adding sediment resuspension does not change this, but it's here for testing
+    nor_tss_drive = ifelse(grepl("total suspended solids|tss", phys_drive, ignore.case = TRUE), 1, 0),
     strat_drive = ifelse(grepl("mix|stab|strat", phys_drive, ignore.case = TRUE), 1, 0),
     restime_drive = ifelse(grepl("residence", phys_drive, ignore.case = TRUE), 1, 0),
     flush_discharge_drive = ifelse(grepl("flush|discharge", phys_drive, ignore.case = TRUE), 1, 0),
@@ -45,9 +47,18 @@ combined_vars <- data |>
     transparency_response = ifelse(grepl("transparency", phys_response, ignore.case = TRUE), 1, 0),
     turb_response = ifelse(grepl("turbidity", phys_response, ignore.case = TRUE), 1, 0),
     light_response = ifelse(grepl("PAR", phys_response, ignore.case = TRUE), 1, 0),
-    tss_tds_response = ifelse(grepl("total suspended solids|tss|tds|total dissolved solid|sediment resuspension", phys_response, ignore.case = TRUE), 1, 0),
+    tds_response = ifelse(grepl("tds|total dissolved solid", phys_response, ignore.case = TRUE), 1, 0),
+    tss_response = ifelse(grepl("total suspended solids|tss|resuspension", phys_response, ignore.case = TRUE), 1, 0),
+    nor_tss_response = ifelse(grepl("total suspended solids|tss", phys_response, ignore.case = TRUE), 1, 0),
     other_phys_response = ifelse(grepl("Other", phys_response, ignore.case = TRUE), 1, 0),
     watercolor_response = ifelse(grepl("water color", phys_response, ignore.case = TRUE), 1, 0),
+    strat_response = ifelse(grepl("mix|stab|strat", phys_response, ignore.case = TRUE), 1, 0),
+    restime_response = ifelse(grepl("residence", phys_response, ignore.case = TRUE), 1, 0),
+    flush_discharge_response = ifelse(grepl("flush|discharge", phys_response, ignore.case = TRUE), 1, 0),
+    inflow_response = ifelse(grepl("inflow", phys_response, ignore.case = TRUE), 1, 0),
+    precip_response = ifelse(grepl("precip|rain", phys_response, ignore.case = TRUE), 1, 0),
+    air_temp_response = ifelse(grepl("air", phys_response, ignore.case = TRUE), 1, 0),
+    other_phys_response = ifelse(grepl("Other", phys_response, ignore.case = TRUE), 1, 0),
     
     tp_response  = ifelse(grepl("TP", chem_response, ignore.case = TRUE), 1, 0),
     tn_response  = ifelse(grepl("TN", chem_response, ignore.case = TRUE), 1, 0),
@@ -101,7 +112,57 @@ combined_vars <- data |>
     transparency_vars = ifelse(grepl("transparency", phys_vars, ignore.case = TRUE), 1, 0),
     turb_vars = ifelse(grepl("turbidity", phys_vars, ignore.case = TRUE), 1, 0),
     light_vars = ifelse(grepl("PAR", phys_vars, ignore.case = TRUE), 1, 0),
-    tss_tds_vars = ifelse(grepl("total suspended solids|tss|tds|total dissolved solid|sediment resuspension", phys_vars, ignore.case = TRUE), 1, 0),
-    other_phys_vars = ifelse(grepl("Other", phys_vars, ignore.case = TRUE), 1, 0))
+    tds_vars = ifelse(grepl("tds|total dissolved solid", phys_vars, ignore.case = TRUE), 1, 0),
+    tss_vars = ifelse(grepl("total suspended solids|tss|resuspension", phys_vars, ignore.case = TRUE), 1, 0),
+    nor_tss_vars = ifelse(grepl("total suspended solids|tss", phys_vars, ignore.case = TRUE), 1, 0),
+    other_phys_vars = ifelse(grepl("Other", phys_vars, ignore.case = TRUE), 1, 0), 
+    strat_vars = ifelse(grepl("mix|stab|strat", phys_vars, ignore.case = TRUE), 1, 0),
+    restime_vars = ifelse(grepl("residence", phys_vars, ignore.case = TRUE), 1, 0),
+    flush_discharge_vars = ifelse(grepl("flush|discharge", phys_vars, ignore.case = TRUE), 1, 0),
+    inflow_vars = ifelse(grepl("inflow", phys_vars, ignore.case = TRUE), 1, 0),
+    precip_vars = ifelse(grepl("precip|rain", phys_vars, ignore.case = TRUE), 1, 0),
+    air_temp_vars = ifelse(grepl("air", phys_vars, ignore.case = TRUE), 1, 0),
+    other_phys_vars = ifelse(grepl("Other", phys_vars, ignore.case = TRUE), 1, 0)) |> 
+
+# If a variable has a 1 in its _drive or _response column,
+# ensure the corresponding _vars column is also set to 1
+  # added 4/10 to check this
+mutate(
+  # Chemical vars
+  tp_vars       = ifelse(tp_drive == 1       | tp_response == 1,       1, tp_vars),
+  tn_vars       = ifelse(tn_drive == 1       | tn_response == 1,       1, tn_vars),
+  nh4_vars      = ifelse(nh4_drive == 1      | nh4_response == 1,      1, nh4_vars),
+  ph_vars       = ifelse(ph_drive == 1       | ph_response == 1,       1, ph_vars),
+  do_vars       = ifelse(do_drive == 1       | do_response == 1,       1, do_vars),
+  srp_vars      = ifelse(srp_drive == 1      | srp_response == 1,      1, srp_vars),
+  no3_vars      = ifelse(no3_drive == 1      | no3_response == 1,      1, no3_vars),
+  cond_vars     = ifelse(cond_drive == 1     | cond_response == 1,     1, cond_vars),
+  metals_vars   = ifelse(metals_drive == 1   | metals_response == 1,   1, metals_vars),
+  orp_vars      = ifelse(orp_drive == 1      | orp_response == 1,      1, orp_vars),
+  no2_vars      = ifelse(no2_drive == 1      | no2_response == 1,      1, no2_vars),
+  doc_vars      = ifelse(doc_drive == 1      | doc_response == 1,      1, doc_vars),
+  dic_vars      = ifelse(dic_drive == 1      | dic_response == 1,      1, dic_vars),
+  dom_vars      = ifelse(dom_drive == 1      | dom_response == 1,      1, dom_vars),
+  pom_vars      = ifelse(pom_drive == 1      | pom_response == 1,      1, pom_vars),
+  tkn_vars      = ifelse(tkn_drive == 1      | tkn_response == 1,      1, tkn_vars),
+  din_vars      = ifelse(din_drive == 1      | din_response == 1,      1, din_vars),
+  salinity_vars = ifelse(salinity_drive == 1 | salinity_response == 1, 1, salinity_vars),
+  
+  # Physical vars
+  water_level_vars      = ifelse(water_level_drive == 1,                                    1, water_level_vars),
+  water_temp_vars       = ifelse(water_temp_drive == 1      | water_temp_response == 1,     1, water_temp_vars),
+  transparency_vars     = ifelse(transparency_drive == 1    | transparency_response == 1,   1, transparency_vars),
+  turb_vars             = ifelse(turb_drive == 1            | turb_response == 1,           1, turb_vars),
+  light_vars            = ifelse(light_drive == 1           | light_response == 1,          1, light_vars),
+  tds_vars              = ifelse(tds_drive == 1             | tds_response == 1,            1, tds_vars),
+  tss_vars              = ifelse(tss_drive == 1             | tss_response == 1,            1, tss_vars),
+  nor_tss_vars          = ifelse(nor_tss_drive == 1         | nor_tss_response == 1,        1, nor_tss_vars),
+  strat_vars            = ifelse(strat_drive == 1           | strat_response == 1,          1, strat_vars),
+  restime_vars          = ifelse(restime_drive == 1,                                        1, restime_vars),
+  flush_discharge_vars  = ifelse(flush_discharge_drive == 1 | flush_discharge_response == 1,1, flush_discharge_vars),
+  inflow_vars           = ifelse(inflow_drive == 1          | inflow_response == 1,         1, inflow_vars),
+  precip_vars           = ifelse(precip_drive == 1          | precip_response == 1,         1, precip_vars),
+  air_temp_vars         = ifelse(air_temp_drive == 1        | air_temp_response == 1,       1, air_temp_vars))
+
 
 }
